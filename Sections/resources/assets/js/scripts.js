@@ -1,14 +1,6 @@
-$(document).ready(function() {
+$(function() {
 
-    var e = $.Deferred(),
-        n = setInterval(function() {
-            $("div.form-group.section-fieldtype").length && (e.resolve(), clearInterval(n))
-        }, 1e3);
-
-    e.done(function() {
-
-        console.log(SectionsUI);
-
+    var ready = function(){
         switch(SectionsUI) {
             case 'accordion':
                 if ($(".publish-fields").length) {
@@ -35,7 +27,7 @@ $(document).ready(function() {
             case 'tabs':
 
                 if ($(".publish-fields").length) {
-                    
+
                     // Label section header
                     $(".form-group.section-fieldtype").addClass("section-header");
 
@@ -107,7 +99,30 @@ $(document).ready(function() {
                 break;
 
         }
-        
-        $('#section-tabs').tab();       
-    })
+
+        $('#section-tabs').tab();
+    }
+
+    // search for publish components
+    var publish = document.body.__vue__.$children.find( component => {
+        return component.$options.name === 'publish';
+    } );
+
+    if( !publish ){
+        return;
+    }
+
+    // search for fields components
+    var fields = publish.$children.find( component => {
+        return component.$options.name === 'publish-fields';
+    } );
+
+    if( !fields ){
+        return;
+    }
+
+    publish.$on( 'fieldsetLoaded', function(){
+        fields.$nextTick( ready );
+    } );
+
 });
